@@ -1,5 +1,14 @@
 # Configuració d'IPsec en R1 i R3
 
+#Contrasenyes
+Contra per la linea: ciscoconpa55
+
+Contra per les linies VTY: ciscovtypa55
+
+Contra enable: ciscoenpa55
+
+Usuari i contra SSH: SSHadmin / ciscosshpa55
+
 ### Pas 1: Comprovar la connectivitat
 
 Si vols executa un ping des de PC-A cap a PC-C per verificar la connectivitat.
