@@ -1,6 +1,6 @@
 # Configuració d'IPsec en R1 i R3
 
-#Contrasenyes
+# Contrasenyes
 Contra per la linea: ciscoconpa55
 
 Contra per les linies VTY: ciscovtypa55
