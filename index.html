@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>docu</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Configuraci\u00f3 d\u0027IPsec en R1 i R3";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> docu
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Configuració d'IPsec en R1 i R3</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">docu</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Configuració d'IPsec en R1 i R3</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/arnau1819/docu-VPN-packettracer/tree/main/edit/master/docs/index.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="configuracio-dipsec-en-r1-i-r3">Configuració d'IPsec en R1 i R3</h1>
+<h1 id="contrasenyes">Contrasenyes</h1>
+<p>Contra per la linea: ciscoconpa55</p>
+<p>Contra per les linies VTY: ciscovtypa55</p>
+<p>Contra enable: ciscoenpa55</p>
+<p>Usuari i contra SSH: SSHadmin / ciscosshpa55</p>
+<h3 id="pas-1-comprovar-la-connectivitat">Pas 1: Comprovar la connectivitat</h3>
+<p>Si vols executa un ping des de PC-A cap a PC-C per verificar la connectivitat.</p>
+<h3 id="pas-2-activar-el-paquet-de-tecnologia-de-seguretat">Pas 2: Activar el paquet de tecnologia de seguretat</h3>
+<p>a. A R1, executa la comanda següent per veure la informació de la llicència del paquet de seguretat:</p>
+<pre><code class="language-bash">show version
+</code></pre>
+<p>b. Si el paquet de seguretat no està activat, activa'l amb la comanda següent:</p>
+<pre><code class="language-bash">R1(config)# license boot module c1900 technology-package securityk9
+</code></pre>
+<p>c. Accepta l'acord de llicència d'usuari final.</p>
+<p>d. Desa la configuració actual i reinicia el router per aplicar els canvis.</p>
+<p>e. Verifica que el paquet de seguretat s'ha activat:</p>
+<pre><code class="language-bash">show version
+</code></pre>
+<h3 id="pas-3-identificar-el-transit-interessant-en-r1">Pas 3: Identificar el trànsit interessant en R1</h3>
+<p>Configura l'ACL 110 per identificar el trànsit entre la LAN de R1 i la LAN de R3 com a interessant:</p>
+<pre><code class="language-bash">R1(config)# access-list 110 permit ip 192.168.1.0 0.0.0.255 192.168.3.0 0.0.0.255
+</code></pre>
+<h3 id="pas-4-configurar-la-fase-1-dike-isakmp-en-r1">Pas 4: Configurar la fase 1 d'IKE (ISAKMP) en R1</h3>
+<p>Configura la política ISAKMP amb els següents paràmetres:</p>
+<pre><code class="language-bash">R1(config)# crypto isakmp policy 10
+R1(config-isakmp)# encryption aes 256
+R1(config-isakmp)# authentication pre-share
+R1(config-isakmp)# group 5
+R1(config-isakmp)# exit
+R1(config)# crypto isakmp key vpnpa55 address 10.2.2.2
+</code></pre>
+<h3 id="pas-5-configurar-la-fase-2-dipsec-en-r1">Pas 5: Configurar la fase 2 d'IPsec en R1</h3>
+<p>a. Crear el conjunt de transformació VPN-SET:</p>
+<pre><code class="language-bash">R1(config)# crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+</code></pre>
+<p>b. Crear el mapa criptogràfic VPN-MAP:</p>
+<pre><code class="language-bash">R1(config)# crypto map VPN-MAP 10 ipsec-isakmp
+R1(config-crypto-map)# description VPN connection to R3
+R1(config-crypto-map)# set peer 10.2.2.2
+R1(config-crypto-map)# set transform-set VPN-SET
+R1(config-crypto-map)# match address 110
+R1(config-crypto-map)# exit
+</code></pre>
+<h3 id="pas-6-assignar-el-mapa-criptografic-a-la-interficie-de-sortida">Pas 6: Assignar el mapa criptogràfic a la interfície de sortida</h3>
+<pre><code class="language-bash">R1(config)# interface s0/0/0
+R1(config-if)# crypto map VPN-MAP
+</code></pre>
+<h2 id="part-2-configuracio-dipsec-en-r3">Part 2: Configuració d'IPsec en R3</h2>
+<h3 id="pas-1-activar-el-paquet-de-seguretat">Pas 1: Activar el paquet de seguretat</h3>
+<p>a. A R3, verifica si el paquet de seguretat està activat:</p>
+<pre><code class="language-bash">show version
+</code></pre>
+<p>b. Si no està activat, activa'l i reinicia el router.</p>
+<h3 id="pas-2-configurar-la-vpn-entre-r3-i-r1">Pas 2: Configurar la VPN entre R3 i R1</h3>
+<p>Defineix el trànsit interessant en R3:</p>
+<pre><code class="language-bash">R3(config)# access-list 110 permit ip 192.168.3.0 0.0.0.255 192.168.1.0 0.0.0.255
+</code></pre>
+<h3 id="pas-3-configurar-la-fase-1-dike-en-r3">Pas 3: Configurar la fase 1 d'IKE en R3</h3>
+<pre><code class="language-bash">R3(config)# crypto isakmp policy 10
+R3(config-isakmp)# encryption aes 256
+R3(config-isakmp)# authentication pre-share
+R3(config-isakmp)# group 5
+R3(config-isakmp)# exit
+R3(config)# crypto isakmp key vpnpa55 address 10.1.1.2
+</code></pre>
+<h3 id="pas-4-configurar-la-fase-2-dipsec-en-r3">Pas 4: Configurar la fase 2 d'IPsec en R3</h3>
+<p>a. Crear el conjunt de transformació VPN-SET:</p>
+<pre><code class="language-bash">R3(config)# crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+</code></pre>
+<p>b. Crear el mapa criptogràfic VPN-MAP:</p>
+<pre><code class="language-bash">R3(config)# crypto map VPN-MAP 10 ipsec-isakmp
+R3(config-crypto-map)# description VPN connection to R1
+R3(config-crypto-map)# set peer 10.1.1.2
+R3(config-crypto-map)# set transform-set VPN-SET
+R3(config-crypto-map)# match address 110
+R3(config-crypto-map)# exit
+</code></pre>
+<h3 id="pas-5-assignar-el-mapa-criptografic-a-la-interficie-de-sortida">Pas 5: Assignar el mapa criptogràfic a la interfície de sortida</h3>
+<pre><code class="language-bash">R3(config)# interface s0/0/1
+R3(config-if)# crypto map VPN-MAP
+</code></pre>
+<h2 id="part-3-verificacio-de-la-vpn-dipsec">Part 3: Verificació de la VPN d'IPsec</h2>
+<h3 id="pas-1-verificar-el-tunel-abans-del-transit-interessant">Pas 1: Verificar el túnel abans del trànsit interessant</h3>
+<p>Executa la comanda següent a R1:</p>
+<pre><code class="language-bash">show crypto ipsec sa
+</code></pre>
+<p>Els comptadors de paquets hauran de ser 0.</p>
+<h3 id="pas-2-generar-transit-interessant">Pas 2: Generar trànsit interessant</h3>
+<p>Fes un ping des de PC-A cap a PC-C.</p>
+<h3 id="pas-3-verificar-el-tunel-despres-del-transit-interessant">Pas 3: Verificar el túnel després del trànsit interessant</h3>
+<p>Executa novament la comanda a R1:</p>
+<pre><code class="language-bash">show crypto ipsec sa
+</code></pre>
+<p>Si el túnel funciona correctament, els comptadors hauran augmentat.</p>
+<h3 id="pas-4-generar-transit-no-interessant">Pas 4: Generar trànsit no interessant</h3>
+<p>Fes un ping des de PC-A cap a PC-B.</p>
+<h3 id="pas-5-verificar-el-tunel">Pas 5: Verificar el túnel</h3>
+<p>Executa la comanda següent a R1:</p>
+<pre><code class="language-bash">show crypto ipsec sa
+</code></pre>
+<p>Els comptadors no haurien de canviar, verificant que el trànsit no interessant no s'encripta.</p>
+<h3 id="pas-6-comprovar-els-resultats">Pas 6: Comprovar els resultats</h3>
+<p>Si la configuració és correcta, la finalització hauria de ser del 100%. Fes clic a "Check Results" per veure la verificació dels components requerits.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/arnau1819/docu-VPN-packettracer/tree/main" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2025-03-26 10:49:43.192594+00:00
+-->
